@@ -139,11 +139,64 @@ jobs:
           path: reports/docker/
         continue-on-error: true
       
-      - name: List available reports
+      - name: Prepare safe email attachments
         run: |
-          echo "=== Available Report Files ==="
-          find reports/ -type f -name "*.tar.gz" -o -name "*.xml" -o -name "*.html" | head -20
-          echo "=== End Report List ==="
+          echo "=== Preparing Email-Safe Attachments ==="
+          
+          # Create a safe report summary instead of binary attachments
+          mkdir -p email-reports
+          
+          # Create text summary of reports
+          cat > email-reports/test-summary.txt << 'EOF'
+          FanCode SDET Test Execution Summary
+          ==================================
+          
+          Main Test Suite: ${{ needs.test.result }}
+          Docker Test Suite: ${{ needs.docker-test.result }}
+          Workflow: ${{ github.workflow }}
+          Branch: ${{ github.ref_name }}
+          Commit: ${{ github.sha }}
+          Run #: ${{ github.run_number }}
+          
+          Reports Available in GitHub Actions Artifacts:
+          - allure-report.tar.gz (Main test suite)
+          - docker-allure-report.tar.gz (Docker test suite)
+          - junit.xml (CI/CD integration)
+          
+          To access reports:
+          1. Visit: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          2. Download artifacts from the "Artifacts" section
+          3. Extract and open allure-report/index.html in your browser
+          
+          Generated: $(date)
+          EOF
+          
+          # Copy JUnit XML as safe attachment (if exists)
+          if [ -f "reports/junit.xml" ]; then
+            cp reports/junit.xml email-reports/junit-results.xml
+            echo "JUnit XML copied for email attachment"
+          fi
+          
+          # Create links file instead of binary attachments
+          cat > email-reports/report-links.txt << 'EOF'
+          Direct Download Links:
+          =====================
+          
+          GitHub Actions Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          
+          Available Artifacts:
+          - test-reports-3.11 (Main test reports)
+          - docker-reports (Docker test reports)
+          
+          Instructions:
+          1. Click the GitHub Actions Run link above
+          2. Scroll down to "Artifacts" section
+          3. Download the report archives
+          4. Extract and open allure-report/index.html
+          EOF
+          
+          ls -la email-reports/
+          echo "=== Email-Safe Attachments Prepared ==="
       - name: Notify workflow completion
         run: |
           echo "FanCode SDET workflow completed."
@@ -157,42 +210,75 @@ jobs:
           server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: FanCode SDET Comprehensive Test Results - ${{ github.run_number }}
+          subject: FanCode SDET Test Results - Run ${{ github.run_number }} [${{ needs.test.result }}]
           to: ${{ secrets.EMAIL_TO }}
           from: ${{ secrets.EMAIL_USERNAME }}
           body: |
-            🚀 **FanCode SDET Test Execution Completed**
+            FanCode SDET Test Execution Completed
+            =====================================
             
-            📊 **Test Results Summary:**
+            Test Results Summary:
             - Main Test Suite: ${{ needs.test.result }}
             - Docker Test Suite: ${{ needs.docker-test.result }}
             - Workflow: ${{ github.workflow }}
             - Branch: ${{ github.ref_name }}
             - Commit: ${{ github.sha }}
-            - Run #: ${{ github.run_number }}
+            - Run Number: ${{ github.run_number }}
             
-            📈 **Allure Reports Included:**
-            - 📁 allure-report.tar.gz: Main test suite Allure report
-            - 📁 docker-allure-report.tar.gz: Docker test suite Allure report (if available)
-            - 📄 junit.xml: JUnit XML for CI/CD integration
+            Allure Reports Available:
+            - Interactive HTML reports with test analytics
+            - Test execution timeline and categorization
+            - Detailed test steps with environment information
+            - Historical trends and failure analysis
             
-            📂 **How to View Allure Reports:**
-            1. Download and extract the .tar.gz files
-            2. Open allure-report/index.html in your browser
-            3. Enjoy rich interactive reports with:
-               - Test execution timeline
-               - Test categorization and grouping
-               - Detailed test steps and attachments
-               - Historical trends and analytics
-               - Environment information
-               - Failure analysis and categorization
+            How to Access Reports:
+            1. Visit GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            2. Download artifacts from the "Artifacts" section:
+               * test-reports-3.11 (Main test suite)
+               * docker-reports (Docker test suite)
+            3. Extract downloaded files
+            4. Open allure-report/index.html in your browser
             
-            🔗 **GitHub Workflow:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Alternative Access:
+            - JUnit XML results attached for CI/CD integration
+            - Text summary attached with direct links
             
-            ---
-            📧 Generated by GitHub Actions - FanCode SDET Assignment
-            ⏰ Execution Time: ${{ github.event.head_commit.timestamp }}
+            Generated by GitHub Actions
+            Execution Time: ${{ github.event.head_commit.timestamp }}
           attachments: |
-            reports/allure-report.tar.gz
-            reports/junit.xml
-            reports/docker/docker-allure-report.tar.gz
+            email-reports/junit-results.xml
+            email-reports/test-summary.txt
+            email-reports/report-links.txt
+      - name: Deploy reports to GitHub Pages (optional)
+        if: always() && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: reports/allure-report
+          destination_dir: test-reports/${{ github.run_number }}
+        continue-on-error: true
+      
+      - name: Create public report links
+        if: always()
+        run: |
+          echo "=== Creating Public Report Links ==="
+          
+          # Add GitHub Pages link if deployed
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            cat >> email-reports/report-links.txt << 'EOF'
+          
+          GitHub Pages (Public Access):
+          https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/test-reports/${{ github.run_number }}/
+          EOF
+          fi
+          
+          # Update summary with additional access methods
+          cat >> email-reports/test-summary.txt << 'EOF'
+          
+          Additional Access Methods:
+          - GitHub Actions Artifacts (requires GitHub account)
+          - GitHub Pages (public, if available)
+          - Direct download from workflow run
+          EOF
+          
+          echo "=== Public Report Links Created ==="
