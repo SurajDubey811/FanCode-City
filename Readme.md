@@ -1,11 +1,14 @@
 
 # FanCode SDET Assignment
 
+Enhanced with **Behavior-Driven Development (BDD)** capabilities using pytest-bdd!
+
 ---
 
 ## 📚 Table of Contents
 
 - [Overview](#overview)
+- [🎯 BDD Framework](#-bdd-framework)
 - [Test Suite Execution](#test-suite-execution)
 - [Project Structure](#️project-structure)
 - [Quick Start](#quick-start)
@@ -31,6 +34,21 @@ Automated validation to ensure **all users of City 'FanCode' have more than half
 - **Given:** User has todo tasks
 - **And:** User belongs to the city FanCode (lat: -40 to 5, lng: 5 to 100)
 - **Then:** User's completed task percentage should be greater than 50%
+
+## 🎯 BDD Framework
+
+This project now supports **Behavior-Driven Development (BDD)** with:
+- ✅ **Gherkin syntax** for readable test scenarios
+- ✅ **Business-focused** test descriptions
+- ✅ **Stakeholder collaboration** through natural language
+- ✅ **Comprehensive coverage** of business requirements
+
+**🚀 Quick BDD Start:**
+```bat
+run_tests_bdd.bat --bdd
+```
+
+📖 **For detailed BDD documentation, see [BDD_README.md](BDD_README.md)**
 
 ---
 

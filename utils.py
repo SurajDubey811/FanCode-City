@@ -18,7 +18,9 @@ def safe_get(dct, keys):
     return dct
 
 def is_in_fancode_city(lat, lng, lat_min=-40, lat_max=5, lng_min=5, lng_max=100):
-    """Check if coordinates are within FanCode City bounds."""
+    """Check if coordinates are within FanCode City bounds. Return False if lat/lng is None."""
+    if lat is None or lng is None:
+        return False
     return lat_min <= lat <= lat_max and lng_min <= lng <= lng_max
 
 def calculate_todo_completion(todos):
