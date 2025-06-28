@@ -52,7 +52,7 @@ jobs:
       continue-on-error: false
       
     - name: Upload test reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-reports-python-${{ matrix.python-version }}
@@ -86,7 +86,7 @@ jobs:
         docker run --rm -v $(pwd)/reports:/app/reports fancode-sdet:latest
         
     - name: Upload Docker test reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: docker-test-reports
@@ -106,7 +106,7 @@ jobs:
         bandit -r . -f json -o security-report.json || true
         
     - name: Upload security report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-report
         path: security-report.json
