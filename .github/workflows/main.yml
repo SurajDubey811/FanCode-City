@@ -58,6 +58,22 @@ jobs:
         reporter: java-junit
         fail-on-error: false
 
+    - name: Send test report via email
+      uses: dawidd6/action-send-mail@v3
+      if: always()
+      with:
+        server_address: ${{ secrets.SMTP_SERVER }}
+        server_port: ${{ secrets.SMTP_PORT }}
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: FanCode SDET Test Results (${{ matrix.python-version }})
+        to: ${{ secrets.EMAIL_TO }}
+        from: ${{ secrets.EMAIL_USERNAME }}
+        body: |
+          The test run for FanCode SDET Assignment has completed.
+          Please find the attached test report for Python ${{ matrix.python-version }}.
+        attachments: reports/report.html
+
   docker-test:
     runs-on: ubuntu-latest
     if: github.event_name != 'schedule'  # Skip on scheduled runs
