@@ -303,6 +303,27 @@ pipeline {
 }
 ```
 
+## 🐳 Running with Docker
+
+To build and run tests in Docker:
+
+```bash
+docker build -t fancode-sdet .
+# On Windows (cmd), use:
+docker run --rm -v %cd%/reports:/app/reports fancode-sdet
+# (Make sure your image name is all lowercase, e.g., 'fancode-sdet')
+
+# If you see 'invalid reference format', ensure you build the image with a lowercase name:
+docker build -t fancode-sdet .
+
+# Then run:
+docker run --rm -v %cd%/reports:/app/reports fancode-sdet
+# Or, use an absolute path (recommended):
+docker run --rm -v C:/Users/91704/Downloads/FanCode SDET Assignment/FanCode City/reports:/app/reports fancode-sdet
+# On Linux/macOS, use:
+# docker run --rm -v "$(pwd)/reports:/app/reports" fancode-sdet
+```
+
 ## 🐛 Troubleshooting
 
 ### Common Issues
