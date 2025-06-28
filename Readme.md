@@ -92,12 +92,26 @@ FanCode City/
 ├── run_tests.bat
 ├── docker-compose.yml
 ├── Dockerfile
+├── .github/
+│   └── workflows/
+│       └── main.yml
 ├── reports/
 │   ├── report.html
 │   ├── report.json
 │   └── test_log_*.log
 └── tests/
-    └── test_fancode_users.py
+    ├── __init__.py
+    ├── test_fancode_users.py
+    ├── test_api_client.py
+    ├── test_validator.py
+    ├── test_user_model.py
+    ├── test_todo_model.py
+    ├── test_utils.py
+    ├── test_api_client_comprehensive.py
+    ├── test_validator_comprehensive.py
+    ├── test_models_comprehensive.py
+    ├── test_utils_comprehensive.py
+    └── test_performance_integration.py
 ```
 
 ---
@@ -167,10 +181,20 @@ After execution, reports are in `reports/`:
 
 ## 🏛️ Architecture & Design
 
-- **APIClient:** Handles API interactions and error handling.
-- **User & Todo Data Classes:** Typed models for API data.
-- **FanCodeCityValidator:** Core business logic and validation.
-- **Test Class:** Comprehensive test coverage and reporting.
+### Components
+
+- **APIClient:** Handles JSONPlaceholder API interactions with comprehensive error handling and retry logic.
+- **User & Todo Data Classes:** Typed models for API data with validation and from_dict factory methods.
+- **FanCodeCityValidator:** Core business logic for city identification and todo completion validation.
+- **Utilities:** FanCode-specific helper functions for coordinate validation and completion calculations.
+- **Comprehensive Test Suite:** Multi-layered testing approach covering unit, integration, performance, and business logic.
+
+### Design Patterns
+
+- **Factory Pattern:** Used in User.from_dict() and Todo.from_dict() for API response parsing
+- **Strategy Pattern:** Flexible validation logic in FanCodeCityValidator
+- **Repository Pattern:** APIClient abstracts data access from business logic
+- **Test Patterns:** Fixtures, Mocking, Parametrized testing, Test categories with markers
 
 ---
 
@@ -189,12 +213,67 @@ Environment variables can override defaults (API URL, city bounds, thresholds, e
 
 ---
 
-## 🧪 Test Cases
+## 🧪 Test Suite
 
-- API connectivity
-- FanCode city identification
-- Todo completion calculation
-- Main validation (per-user and overall)
+### Test Categories
+
+The test suite is organized into multiple categories covering all testing concepts:
+
+#### **Core Tests:**
+- `test_fancode_users.py` - Main integration tests for FanCode user validation
+- `test_api_client.py` - API client integration tests
+- `test_validator.py` - Validator logic tests with FanCode-specific markers
+- `test_user_model.py` - User data model tests
+- `test_todo_model.py` - Todo data model tests
+- `test_utils.py` - Utility function tests
+
+#### **Comprehensive Test Suites:**
+- `test_api_client_comprehensive.py` - **Integration, Error Handling, Mocking, Performance**
+- `test_validator_comprehensive.py` - **Unit, Boundary, Integration, Business Logic**
+- `test_models_comprehensive.py` - **Data Models, Edge Cases, FanCode Scenarios**
+- `test_utils_comprehensive.py` - **FanCode Utilities, Parametrized Tests**
+- `test_performance_integration.py` - **Performance, Load, Stress, E2E Testing**
+
+#### **Test Markers:**
+```bash
+@pytest.mark.fancode      # FanCode-specific business logic tests
+@pytest.mark.api          # API integration tests
+@pytest.mark.performance  # Performance and load tests
+@pytest.mark.business_logic # Business rule validation
+@pytest.mark.load         # Load testing scenarios
+@pytest.mark.stress       # Stress testing scenarios
+@pytest.mark.reliability  # Reliability and error recovery tests
+```
+
+#### **Running Specific Test Categories:**
+```bash
+# Run all tests
+pytest tests/ -v
+
+# Run FanCode-specific tests
+pytest -m fancode -v
+
+# Run API integration tests
+pytest -m api -v
+
+# Run performance tests
+pytest -m performance -v
+
+# Run comprehensive test suites
+pytest tests/test_*_comprehensive.py -v
+
+# Run with parallel execution
+pytest tests/ -n auto
+```
+
+### Test Coverage
+
+The test suite covers:
+- **Functional Testing:** Unit, Integration, End-to-End
+- **Non-Functional Testing:** Performance, Load, Stress, Reliability
+- **Test Design Techniques:** Boundary Value Analysis, Equivalence Partitioning, Parametrized Testing
+- **FanCode Business Logic:** City coordinate validation, Todo completion thresholds, API integration
+- **Error Scenarios:** Network failures, Invalid data, Edge cases
 
 ---
 
