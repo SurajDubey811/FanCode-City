@@ -14,7 +14,6 @@ services:
       - fancode-network
     restart: "no"
 
-  # Optional: Add a simple web server to serve test reports
   report-server:
     image: nginx:alpine
     container_name: fancode-report-server
