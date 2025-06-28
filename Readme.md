@@ -172,10 +172,34 @@ run_tests.bat --regression --parallel
 
 ## 📊 Test Reports
 
-After execution, reports are in `reports/`:
-- **HTML:** `report.html`
-- **JSON:** `report.json`
-- **Logs:** `test_log_*.log`
+### Allure Reporting (Primary)
+This project uses **Allure** for comprehensive test reporting with rich visualizations and analytics.
+
+**Report Generation:**
+- Reports are automatically generated in `reports/allure-report/`
+- Raw results stored in `reports/allure-results/`
+
+**Viewing Reports:**
+```bash
+# Option 1: Open static HTML report
+# Navigate to reports/allure-report/index.html
+
+# Option 2: Serve with Allure (recommended)
+allure serve reports/allure-results
+```
+
+**Features:**
+- Test execution timeline
+- Test categorization by features/stories
+- Detailed test steps with attachments
+- Historical trends and analytics
+- Environment information
+- Failure categorization
+
+**Setup:** See [ALLURE_SETUP.md](ALLURE_SETUP.md) for installation and configuration details.
+
+### Additional Reports
+- **Logs:** `test_log_*.log` files in `reports/` directory
 
 ---
 

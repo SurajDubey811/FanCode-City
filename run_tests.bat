@@ -108,8 +108,8 @@ if "%PARALLEL%"=="true" (
 
 REM Add report generation
 if "%GENERATE_REPORT%"=="true" (
-    set PYTEST_CMD=%PYTEST_CMD% --html=reports/report.html --self-contained-html
-    echo [INFO] HTML report generation enabled
+    set PYTEST_CMD=%PYTEST_CMD% --alluredir=reports/allure-results --clean-alluredir
+    echo [INFO] Allure report generation enabled
 )
 
 REM Run the tests
@@ -120,27 +120,31 @@ echo ==========================================
 %PYTEST_CMD%
 if errorlevel 1 (
     echo [ERROR] Some tests failed. Check the reports for details.
-    exit /b 1
-) else (
-    echo [SUCCESS] All tests completed successfully!
     if "%GENERATE_REPORT%"=="true" (
-        echo [INFO] HTML report generated: %CD%\reports\report.html
-    )
-    for %%f in (reports\test_log_*.log) do (
-        if exist "%%f" (
-            echo [INFO] Log files available in reports\ directory
-            goto breaklog
+        echo [INFO] Generating Allure report...
+        allure generate reports/allure-results -o reports/allure-report --clean
+        if not errorlevel 1 (
+            echo [INFO] Allure report generated: %CD%\reports\allure-report\index.html
+            echo [INFO] To serve the report, run: allure serve reports/allure-results
+        ) else (
+            echo [WARNING] Failed to generate Allure report. Make sure Allure CLI is installed.
+            echo [INFO] Raw test results available in: %CD%\reports\allure-results
         )
     )
-    :breaklog
-    echo ==========================================
-    echo [SUCCESS] Test execution completed successfully!
-)
     exit /b 1
 ) else (
     echo [SUCCESS] All tests completed successfully!
     if "%GENERATE_REPORT%"=="true" (
-        echo [INFO] HTML report generated: %CD%\reports\report.html
+        echo [INFO] Generating Allure report...
+        allure generate reports/allure-results -o reports/allure-report --clean
+        if not errorlevel 1 (
+            echo [INFO] Allure report generated: %CD%\reports\allure-report\index.html
+            echo [INFO] To view the report, open: %CD%\reports\allure-report\index.html
+            echo [INFO] To serve the report, run: allure serve reports/allure-results
+        ) else (
+            echo [WARNING] Failed to generate Allure report. Make sure Allure CLI is installed.
+            echo [INFO] Raw test results available in: %CD%\reports\allure-results
+        )
     )
     for %%f in (reports\test_log_*.log) do (
         if exist "%%f" (

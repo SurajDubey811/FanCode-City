@@ -143,8 +143,8 @@ fi
 
 # Add report generation
 if [ "$GENERATE_REPORT" = "true" ]; then
-    PYTEST_CMD="$PYTEST_CMD --html=reports/report.html --self-contained-html"
-    print_status "HTML report generation enabled"
+    PYTEST_CMD="$PYTEST_CMD --alluredir=reports/allure-results --clean-alluredir"
+    print_status "Allure report generation enabled"
 fi
 
 # Run the tests
@@ -155,10 +155,23 @@ echo "=========================================="
 if $PYTEST_CMD; then
     print_success "All tests completed successfully!"
     
-    # Show report location
+    # Generate Allure report
     if [ "$GENERATE_REPORT" = "true" ]; then
-        print_status "HTML report generated: $(pwd)/reports/report.html"
-        print_status "JSON report generated: $(pwd)/reports/report.json"
+        print_status "Generating Allure report..."
+        if command -v allure &> /dev/null; then
+            allure generate reports/allure-results -o reports/allure-report --clean
+            if [ $? -eq 0 ]; then
+                print_status "Allure report generated: $(pwd)/reports/allure-report/index.html"
+                print_status "To view the report, open: $(pwd)/reports/allure-report/index.html"
+                print_status "To serve the report, run: allure serve reports/allure-results"
+            else
+                print_warning "Failed to generate Allure report"
+                print_status "Raw test results available in: $(pwd)/reports/allure-results"
+            fi
+        else
+            print_warning "Allure CLI not found. Install it with: npm install -g allure-commandline"
+            print_status "Raw test results available in: $(pwd)/reports/allure-results"
+        fi
     fi
     
     # Show log files
@@ -171,6 +184,24 @@ if $PYTEST_CMD; then
     
 else
     print_error "Some tests failed. Check the reports for details."
+    
+    # Generate Allure report even on failure
+    if [ "$GENERATE_REPORT" = "true" ]; then
+        print_status "Generating Allure report..."
+        if command -v allure &> /dev/null; then
+            allure generate reports/allure-results -o reports/allure-report --clean
+            if [ $? -eq 0 ]; then
+                print_status "Allure report generated: $(pwd)/reports/allure-report/index.html"
+                print_status "To serve the report, run: allure serve reports/allure-results"
+            else
+                print_warning "Failed to generate Allure report"
+                print_status "Raw test results available in: $(pwd)/reports/allure-results"
+            fi
+        else
+            print_warning "Allure CLI not found. Install it with: npm install -g allure-commandline"
+            print_status "Raw test results available in: $(pwd)/reports/allure-results"
+        fi
+    fi
     echo "=========================================="
     exit 1
 fi

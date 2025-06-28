@@ -1,7 +1,6 @@
 # Project dependencies
 pytest==7.4.3
 requests==2.31.0
-pytest-html==4.1.1
-pytest-json-report==1.5.0
+allure-pytest==2.13.2
 pytest-xdist==3.5.0
 psutil==5.9.6
