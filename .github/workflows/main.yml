@@ -47,7 +47,7 @@ jobs:
 
     - name: Run all tests
       run: |
-        pytest -v --html=reports/full-report.html --self-contained-html --json-report --json-report-file=reports/test-results.json || true
+        pytest -v --junitxml=reports/junit-report.xml --html=reports/full-report.html --self-contained-html || true
 
     - name: List reports directory (debug)
       run: |
@@ -68,8 +68,8 @@ jobs:
       if: always()
       with:
         name: Test Results (Python ${{ matrix.python-version }})
-        path: reports/test-results.json
-        reporter: jest-junit
+        path: reports/junit-report.xml
+        reporter: junit
 
   docker-test:
     runs-on: ubuntu-latest
