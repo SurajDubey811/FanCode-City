@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  fancode-tests:
+    build: .
+    container_name: fancode-sdet-tests
+    volumes:
+      - ./reports:/app/reports
+    environment:
+      - API_BASE_URL=http://jsonplaceholder.typicode.com
+      - COMPLETION_THRESHOLD=50
+      - LOG_LEVEL=INFO
+    networks:
+      - fancode-network
+    restart: "no"
+
+  # Optional: Add a simple web server to serve test reports
+  report-server:
+    image: nginx:alpine
+    container_name: fancode-report-server
+    ports:
+      - "8080:80"
+    volumes:
+      - ./reports:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - fancode-tests
+    networks:
+      - fancode-network
+    profiles:
+      - reports
+
+networks:
+  fancode-network:
+    driver: bridge
+
+volumes:
+  reports-data:
