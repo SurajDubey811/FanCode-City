@@ -8,6 +8,18 @@ on:
   schedule:
     # Run tests daily at 2 AM UTC
     - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      python_version:
+        description: 'Python version to test (leave empty for all)'
+        required: false
+        default: ''
+        type: string
+      run_security_scan:
+        description: 'Run security scan'
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: read
