@@ -58,22 +58,6 @@ jobs:
         reporter: java-junit
         fail-on-error: false
 
-    - name: Send test report via email
-      uses: dawidd6/action-send-mail@v3
-      if: always()
-      with:
-        server_address: ${{ secrets.SMTP_SERVER }}
-        server_port: ${{ secrets.SMTP_PORT }}
-        username: ${{ secrets.EMAIL_USERNAME }}
-        password: ${{ secrets.EMAIL_PASSWORD }}
-        subject: FanCode SDET Test Results (${{ matrix.python-version }})
-        to: ${{ secrets.EMAIL_TO }}
-        from: ${{ secrets.EMAIL_USERNAME }}
-        body: |
-          The test run for FanCode SDET Assignment has completed.
-          Please find the attached test report for Python ${{ matrix.python-version }}.
-        attachments: reports/report.html
-
   docker-test:
     runs-on: ubuntu-latest
     if: github.event_name != 'schedule'  # Skip on scheduled runs
@@ -94,3 +78,45 @@ jobs:
         name: docker-reports
         path: reports/
         retention-days: 7
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [test, docker-test]
+    if: always()
+    steps:
+      - name: Download test reports
+        uses: actions/download-artifact@v4
+        with:
+          name: test-reports-3.11
+          path: reports/
+      - name: Download docker reports
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-reports
+          path: reports/docker/
+      - name: Notify workflow completion
+        run: |
+          echo "FanCode SDET workflow completed."
+          echo "Test job status: ${{ needs.test.result }}"
+          echo "Docker-test job status: ${{ needs.docker-test.result }}"
+      - name: Send comprehensive test report via email
+        uses: dawidd6/action-send-mail@v3
+        if: always()
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: FanCode SDET Comprehensive Test Results
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_USERNAME }}
+          body: |
+            The FanCode SDET workflow has completed.
+
+            Test job status: ${{ needs.test.result }}
+            Docker-test job status: ${{ needs.docker-test.result }}
+
+            Please find the attached test reports.
+          attachments: |
+            reports/report.html
+            reports/docker/report.html
