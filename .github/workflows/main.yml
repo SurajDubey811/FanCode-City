@@ -89,12 +89,27 @@ jobs:
         docker build -t fancode-sdet .
         docker run --rm -v $(pwd)/reports:/app/reports fancode-sdet || true
         
-    - name: Create Docker report archive
+    - name: Install Allure CLI for Docker reports
+      if: always()
+      run: |
+        # Install Allure CLI to generate reports from Docker test results
+        curl -o allure-commandline.tgz -Ls https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.tgz
+        tar -zxf allure-commandline.tgz -C /opt/
+        sudo ln -s /opt/allure-2.24.0/bin/allure /usr/bin/allure
+        allure --version
+      continue-on-error: true
+        
+    - name: Generate Docker Allure report
       if: always()
       run: |
         cd reports
-        if [ -d "allure-report" ]; then
-          tar -czf docker-allure-report.tar.gz allure-report/
+        if [ -d "allure-results" ] && [ "$(ls -A allure-results)" ]; then
+          echo "Generating Allure report from Docker test results..."
+          allure generate allure-results -o docker-allure-report --clean
+          tar -czf docker-allure-report.tar.gz docker-allure-report/
+          echo "Docker Allure report generated successfully"
+        else
+          echo "No Docker allure-results found or directory is empty"
         fi
         ls -la
       continue-on-error: true
