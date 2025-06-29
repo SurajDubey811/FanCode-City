@@ -3,16 +3,13 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import pytest
-import logging
 from typing import Dict
 from user import User
 from todo import Todo
 from api_client import APIClient
 from validator import FanCodeCityValidator
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+
 
 
 class TestFanCodeUserTodoCompletion:
@@ -36,7 +33,7 @@ class TestFanCodeUserTodoCompletion:
         assert len(users) > 0, "No users found in API response"
         assert len(todos) > 0, "No todos found in API response"
         
-        logger.info(f"API connectivity test passed: {len(users)} users, {len(todos)} todos")
+        # removed live log
     
     def test_fancode_city_identification(self, validator):
         """Test FanCode city user identification logic"""
@@ -51,7 +48,7 @@ class TestFanCodeUserTodoCompletion:
             assert validator.LNG_MIN <= user.lng <= validator.LNG_MAX, \
                 f"User {user.name} lng {user.lng} is outside FanCode city range"
         
-        logger.info(f"FanCode city identification test passed for {len(fancode_users)} users")
+        # removed live log
     
     def test_todo_completion_calculation(self, validator, api_client):
         """Test todo completion percentage calculation"""
@@ -71,27 +68,20 @@ class TestFanCodeUserTodoCompletion:
         assert abs(completion_percentage - expected_percentage) < 0.01, \
             f"Completion percentage calculation mismatch"
         
-        logger.info(f"Todo completion calculation test passed")
+        # removed live log
     
     def test_fancode_users_todo_completion_rate(self, validator):
         """Main test: Validate that all FanCode city users have >50% todo completion"""
         result_summary = validator.validate_all_fancode_users()
         
         # Log detailed results
-        logger.info("=" * 60)
-        logger.info("FANCODE CITY USERS TODO COMPLETION REPORT")
-        logger.info("=" * 60)
+        # removed live log
         
         for user_result in result_summary['user_results']:
             status = "✓ PASS" if user_result['passed'] else "✗ FAIL"
-            logger.info(f"{status} | {user_result['user_name']} | "
-                       f"{user_result['completed_todos']}/{user_result['total_todos']} "
-                       f"({user_result['completion_percentage']:.1f}%)")
+            # removed live log
         
-        logger.info("=" * 60)
-        logger.info(f"SUMMARY: {result_summary['passed_users']}/{result_summary['total_users']} users passed")
-        logger.info(f"OVERALL RESULT: {'PASS' if result_summary['overall_result'] else 'FAIL'}")
-        logger.info("=" * 60)
+        # removed live log
         
         # Assertion for the main requirement
         assert result_summary['total_users'] > 0, "No FanCode city users found"
@@ -105,7 +95,7 @@ class TestFanCodeUserTodoCompletion:
         assert result_summary['overall_result'], \
             f"The following FanCode city users have ≤50% todo completion rate: {', '.join(failed_users)}"
         
-        logger.info("🎉 All FanCode city users have more than 50% of their todos completed!")
+        # removed live log
 
 
 if __name__ == "__main__":

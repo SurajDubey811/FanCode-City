@@ -1,5 +1,7 @@
 # Step for: Then the percentage should be between 0 and 100
 from pytest_bdd import then, parsers,  given, when
+import pytest
+pytestmark = pytest.mark.bdd
 
 @then("the percentage should be between 0 and 100")
 def percentage_should_be_between_0_and_100(context):

@@ -11,6 +11,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         curl \
         gcc \
+        dos2unix \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -19,8 +20,12 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 COPY . .
 RUN mkdir -p reports
-RUN chmod +x run_tests.sh
-CMD ["./run_tests.sh"]
+COPY run_tests.sh /app/run_tests.sh
+RUN dos2unix /app/run_tests.sh \
+    && chmod +x /app/run_tests.sh \
+    && sed -i 's/\r$//' /app/run_tests.sh
+ENV DOCKER_ENV=1
+CMD ["/bin/bash", "/app/run_tests.sh"]
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://jsonplaceholder.typicode.com/users || exit 1

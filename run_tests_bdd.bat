@@ -143,7 +143,7 @@ if "%RUN_BDD%"=="1" (
     echo                     Running BDD Tests
     echo ================================================================
     
-set "BDD_CMD=!TEST_CMD! tests/"
+    set "BDD_CMD=!TEST_CMD! -m bdd tests/"
     echo Command: !BDD_CMD!
     echo.
     
@@ -166,7 +166,7 @@ if "%RUN_TRADITIONAL%"=="1" (
     echo                   Running Traditional Tests
     echo ================================================================
     
-    set "TRADITIONAL_CMD=!TEST_CMD! tests/ --ignore=tests/test_bdd_*.py"
+    set "TRADITIONAL_CMD=!TEST_CMD! -m not\ bdd tests"
     echo Command: !TRADITIONAL_CMD!
     echo.
     

@@ -1,10 +1,8 @@
-import logging
 from typing import List, Tuple, Dict
 from user import User
 from todo import Todo
 from api_client import APIClient
 
-logger = logging.getLogger(__name__)
 
 class FanCodeCityValidator:
     """Validator class for FanCode city users and their todo completion rates"""
@@ -38,7 +36,7 @@ class FanCodeCityValidator:
         all_users = self.api_client.get_users()
         fancode_users = [user for user in all_users if self.is_fancode_city_user(user)]
 
-        logger.info(f"Found {len(fancode_users)} users in FanCode city out of {len(all_users)} total users")
+        # removed live log
         return fancode_users
 
     def validate_user_completion_rate(self, user: User) -> Tuple[bool, float, int, int]:
@@ -53,8 +51,7 @@ class FanCodeCityValidator:
 
         is_valid = completion_percentage > self.COMPLETION_THRESHOLD
 
-        logger.info(f"User {user.name} (ID: {user.id}): {completed_count}/{total_count} "
-                   f"todos completed ({completion_percentage:.1f}%) - {'PASS' if is_valid else 'FAIL'}")
+        # removed live log
 
         return is_valid, completion_percentage, completed_count, total_count
 
@@ -63,7 +60,7 @@ class FanCodeCityValidator:
         fancode_users = self.get_fancode_users()
 
         if not fancode_users:
-            logger.warning("No users found in FanCode city")
+            # removed live log
             return {
                 'total_users': 0,
                 'passed_users': 0,
@@ -104,6 +101,6 @@ class FanCodeCityValidator:
             'user_results': user_results
         }
 
-        logger.info(f"Validation Summary: {passed_count}/{len(fancode_users)} users passed the 50% completion criteria")
+        # removed live log
 
         return result_summary

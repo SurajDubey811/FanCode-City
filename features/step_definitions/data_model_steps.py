@@ -6,6 +6,9 @@ from pytest_bdd import given, when, then, parsers
 import sys
 import os
 
+pytestmark = pytest.mark.bdd
+
+
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 

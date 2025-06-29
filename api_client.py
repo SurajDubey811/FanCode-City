@@ -1,10 +1,8 @@
 import requests
-import logging
 from typing import List
 from user import User
 from todo import Todo
 
-logger = logging.getLogger(__name__)
 
 class APIClient:
     """API client for JSONPlaceholder endpoints"""
@@ -26,7 +24,7 @@ class APIClient:
             users_data = response.json()
             return [User.from_dict(user_data) for user_data in users_data]
         except requests.RequestException as e:
-            logger.error(f"Failed to fetch users: {e}")
+            # removed live log
             raise
 
     def get_todos(self) -> List[Todo]:
@@ -37,7 +35,7 @@ class APIClient:
             todos_data = response.json()
             return [Todo.from_dict(todo_data) for todo_data in todos_data]
         except requests.RequestException as e:
-            logger.error(f"Failed to fetch todos: {e}")
+            # removed live log
             raise
 
     def get_user_todos(self, user_id: int) -> List[Todo]:
@@ -48,5 +46,5 @@ class APIClient:
             todos_data = response.json()
             return [Todo.from_dict(todo_data) for todo_data in todos_data]
         except requests.RequestException as e:
-            logger.error(f"Failed to fetch todos for user {user_id}: {e}")
+            # removed live log
             raise

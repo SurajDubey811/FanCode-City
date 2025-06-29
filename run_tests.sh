@@ -1,4 +1,10 @@
+
 #!/bin/bash
+
+# Ensure this script uses Unix line endings (LF) and is executable
+# To fix Docker 'no such file or directory' errors:
+#   1. Convert line endings: dos2unix run_tests.sh
+#   2. Make executable: chmod +x run_tests.sh
 
 # FanCode SDET Assignment - Test Execution Script
 # This script sets up the environment and runs the test suite
@@ -49,27 +55,31 @@ fi
 
 print_status "pip3 found: $(pip3 --version)"
 
-# Create virtual environment if it doesn't exist
-if [ ! -d "venv" ]; then
-    print_status "Creating virtual environment..."
-    python3 -m venv venv
-    print_success "Virtual environment created"
+# Create virtual environment if it doesn't exist (skip in Docker)
+if [ -z "$DOCKER_ENV" ]; then
+    if [ ! -d "venv" ]; then
+        print_status "Creating virtual environment..."
+        python3 -m venv venv
+        print_success "Virtual environment created"
+    else
+        print_status "Virtual environment already exists"
+    fi
+
+    # Activate virtual environment
+    print_status "Activating virtual environment..."
+    source venv/bin/activate
+
+    # Upgrade pip
+    print_status "Upgrading pip..."
+    pip install --upgrade pip
+
+    # Install dependencies
+    print_status "Installing dependencies..."
+    pip install -r requirements.txt
+    print_success "Dependencies installed successfully"
 else
-    print_status "Virtual environment already exists"
+    print_status "Running in Docker - skipping virtual environment setup"
 fi
-
-# Activate virtual environment
-print_status "Activating virtual environment..."
-source venv/bin/activate
-
-# Upgrade pip
-print_status "Upgrading pip..."
-pip install --upgrade pip
-
-# Install dependencies
-print_status "Installing dependencies..."
-pip install -r requirements.txt
-print_success "Dependencies installed successfully"
 
 # Create reports directory
 mkdir -p reports
@@ -175,5 +185,7 @@ else
     exit 1
 fi
 
-# Deactivate virtual environment
-deactivate
+# Deactivate virtual environment (only if not in Docker)
+if [ -z "$DOCKER_ENV" ]; then
+    deactivate
+fi

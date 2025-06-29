@@ -1,5 +1,8 @@
 # Support: a user has coordinates latitude {lat} and longitude {lng}
 from pytest_bdd import given, parsers
+import pytest
+pytestmark = pytest.mark.bdd
+
 
 def user_has_coordinates_any(lat, lng, context):
     """Store coordinates for user (alternate wording, for boundary tests)"""
