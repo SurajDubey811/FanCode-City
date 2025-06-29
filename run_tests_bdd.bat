@@ -89,15 +89,19 @@ if "%RUN_BDD%"=="0" if "%RUN_TRADITIONAL%"=="0" (
 echo Current directory: %CD%
 echo.
 
-REM Install/upgrade dependencies
-echo Installing dependencies...
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-if errorlevel 1 (
-    echo ERROR: Failed to install dependencies
-    exit /b 1
+REM Install/upgrade dependencies (skip in Docker)
+if not defined DOCKER_ENV (
+    echo Installing dependencies...
+    python -m pip install --upgrade pip
+    python -m pip install -r requirements.txt
+    if errorlevel 1 (
+        echo ERROR: Failed to install dependencies
+        exit /b 1
+    )
+    echo Dependencies installed successfully.
+) else (
+    echo Running in Docker - skipping dependency installation
 )
-echo Dependencies installed successfully.
 echo.
 
 REM Create reports directory
@@ -143,7 +147,7 @@ if "%RUN_BDD%"=="1" (
     echo                     Running BDD Tests
     echo ================================================================
     
-    set "BDD_CMD=!TEST_CMD! -m bdd tests/"
+    set "BDD_CMD=!TEST_CMD! tests/test_bdd_api_client.py tests/test_bdd_data_models.py tests/test_bdd_fancode.py tests/test_bdd_fancode_main.py tests/test_bdd_utilities.py"
     echo Command: !BDD_CMD!
     echo.
     
@@ -166,7 +170,7 @@ if "%RUN_TRADITIONAL%"=="1" (
     echo                   Running Traditional Tests
     echo ================================================================
     
-    set "TRADITIONAL_CMD=!TEST_CMD! -m not\ bdd tests"
+    set "TRADITIONAL_CMD=!TEST_CMD! tests/ --ignore=tests/test_bdd_api_client.py --ignore=tests/test_bdd_data_models.py --ignore=tests/test_bdd_fancode.py --ignore=tests/test_bdd_fancode_main.py --ignore=tests/test_bdd_utilities.py"
     echo Command: !TRADITIONAL_CMD!
     echo.
     

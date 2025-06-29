@@ -22,18 +22,22 @@ if errorlevel 1 (
 )
 pip --version
 
-REM Upgrade pip
-echo [INFO] Upgrading pip...
-pip install --upgrade pip
+REM Upgrade pip (skip in Docker)
+if not defined DOCKER_ENV (
+    echo [INFO] Upgrading pip...
+    pip install --upgrade pip
 
-REM Install dependencies
-echo [INFO] Installing dependencies...
-pip install -r requirements.txt
-if errorlevel 1 (
-    echo [ERROR] Failed to install dependencies.
-    exit /b 1
+    REM Install dependencies
+    echo [INFO] Installing dependencies...
+    pip install -r requirements.txt
+    if errorlevel 1 (
+        echo [ERROR] Failed to install dependencies.
+        exit /b 1
+    )
+    echo [SUCCESS] Dependencies installed successfully
+) else (
+    echo [INFO] Running in Docker - skipping pip upgrade and dependency installation
 )
-echo [SUCCESS] Dependencies installed successfully
 
 REM Create reports directory
 if not exist reports (
